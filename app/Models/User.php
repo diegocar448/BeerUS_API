@@ -6,26 +6,42 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
 
 /**
  * Class User
- * 
+ *
  * @property int $id
- * @property string $email
+ * @property string $fullname
+ * @property string $username
  * @property string $password
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- * @property string|null $deleted_at
+ * @property string $image
+ * @property int $activated
+ *
+ * @property Collection|Employee[] $employees
+ * @property Collection|Schedule[] $schedules
  *
  * @package App\Models
  */
-class User extends Model
+class User extends Authenticatable implements JWTSubject
 {
-	use SoftDeletes;
+
+    use SoftDeletes, HasFactory, Notifiable;
+
 	protected $table = 'users';
+	public $timestamps = false;
+
+	protected $casts = [
+		'activated' => 'int'
+	];
 
 	protected $hidden = [
 		'password'
@@ -35,4 +51,33 @@ class User extends Model
 		'email',
 		'password'
 	];
+
+
+
+
+
+
+    //JWT
+
+    // Rest omitted for brevity
+
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 }
